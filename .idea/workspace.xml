@@ -2,19 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="94f8b66f-ff8a-470a-b21a-3a0853cf6f5c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/public/models/face_landmark_68_model-shard1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/face_landmark_68_model-weights_manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/face_recognition_model-shard1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/face_recognition_model-shard2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/face_recognition_model-weights_manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/mtcnn_model-shard1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/mtcnn_model-weights_manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/ssd_mobilenetv1_model-shard1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/ssd_mobilenetv1_model-shard2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/ssd_mobilenetv1_model-weights_manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/tiny_face_detector_model-shard1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/models/tiny_face_detector_model-weights_manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
@@ -81,7 +68,7 @@
       <workItem from="1584765850111" duration="1670000" />
       <workItem from="1584769705940" duration="366000" />
       <workItem from="1656740147806" duration="1900000" />
-      <workItem from="1656795023857" duration="5867000" />
+      <workItem from="1656795023857" duration="6883000" />
     </task>
     <servers />
   </component>

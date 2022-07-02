@@ -2,7 +2,7 @@ import React, { useEffect, useRef }  from 'react'
 import './App.css'
 import styled from 'styled-components'
 import * as faceapi from 'face-api.js'
-// import { Input } from '@chakra-ui/react'
+import { Input, Image, Box } from '@chakra-ui/react'
 
 const MainCanvas = styled.canvas`
     border: 1px solid red;
@@ -40,11 +40,8 @@ function App() {
 
         const resizedDetections = faceapi.resizeResults(detections, displaySize)
 
-        resizedDetections.forEach( detection => {
-            const box = detection.detection.box
-            const drawBox = new faceapi.draw.DrawBox(box, { label : 'Face' })
-            drawBox.draw(apiCanvas)
-        })
+        faceapi.draw.drawDetections(apiCanvas, resizedDetections)
+        faceapi.draw.drawFaceLandmarks(apiCanvas, resizedDetections)
 
         canvasRef.current.width = apiCanvas.width
         canvasRef.current.height = apiCanvas.height
@@ -54,8 +51,11 @@ function App() {
 
   return (
     <div className="App">
-        <input ref={inputRef} type="file" id="ImageUpload" onChange={handleChange}/>
-        <img ref={imageRef}/><canvas ref={canvasRef}></canvas>
+        <Input ref={inputRef} type="file" id="ImageUpload" onChange={handleChange}/>
+        <Box pos="relative">
+            <Image ref={imageRef}/>
+            <Box pos="absolute" left={0} top={0}><canvas ref={canvasRef}></canvas></Box>
+        </Box>
     </div>
   )
 }
