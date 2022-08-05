@@ -2,6 +2,7 @@ import React, { useEffect, useRef }  from 'react'
 import './App.css'
 import * as faceapi from 'face-api.js'
 import { Input, Image, Box } from '@chakra-ui/react'
+import { getPointsArrayCenter } from './util/math'
 
 const MODEL_URL = '/models'
 
@@ -10,7 +11,7 @@ const RIGHT_EYE_IDS = [42, 43, 44, 45, 46, 47] // zero based off of landmark68
 
 function App() {
   const inputRef = useRef<HTMLInputElement>(null)
-  // const imageRef = useRef()
+  const imageRef = useRef<HTMLImageElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const start = ()=>{
@@ -33,7 +34,7 @@ function App() {
 
     // const centeredCanvas = await faceapi.imageToSquare(image, 500, true)
 
-    // imageRef.current.src = image.src
+    if(imageRef.current) imageRef.current.src = image.src
 
     const apiCanvas = faceapi.createCanvasFromMedia(image)
 
@@ -44,14 +45,17 @@ function App() {
 
     const resizedDetections = faceapi.resizeResults(detections, displaySize)
 
-    console.log(resizedDetections[0])
+    const alignmentLandmarks = {
+      leftEyeMid: getPointsArrayCenter(resizedDetections[0].landmarks.getLeftEye()),
+      rightEyeMid: getPointsArrayCenter(resizedDetections[0].landmarks.getRightEye()),
+      eyesMid: { x:0, y:0 }
+    }
+    alignmentLandmarks.eyesMid = getPointsArrayCenter([alignmentLandmarks.leftEyeMid, alignmentLandmarks.rightEyeMid])
 
     //Align face
     //const alignedBox = faceapi.FaceLandmarks.prototype.align(resizedDetections[0].detection, { useDlibAlignment: true })
 
-    console.log({ faceapi, FaceLandmarks: faceapi.FaceLandmarks.prototype.align })
-
-    console.log({ resizedDetections })
+    console.log({ alignmentLandmarks })
 
     faceapi.draw.drawDetections(apiCanvas, resizedDetections)
     faceapi.draw.drawFaceLandmarks(apiCanvas, resizedDetections)
@@ -75,7 +79,7 @@ function App() {
       <div className="App">
         <Input ref={inputRef} type="file" id="ImageUpload" onChange={handleChange}/>
         <Box pos="relative" border="1px solid red">
-          {/*<Image ref={imageRef} border="1px solid green"/>*/}
+          <Image ref={imageRef} border="1px solid green"/>
           <Box pos="absolute" left="50%" top={0} border="1px solid blue" transform="translate(-50%, 0)">
             <canvas ref={canvasRef}></canvas>
           </Box>
