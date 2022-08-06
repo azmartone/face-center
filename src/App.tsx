@@ -1,8 +1,8 @@
-import React, { useEffect, useRef }  from 'react'
+import React, { useEffect, useRef, useState }  from 'react'
 import './App.css'
 import * as faceapi from 'face-api.js'
 import { Input, Image, Box } from '@chakra-ui/react'
-import { getPointsArrayCenter } from './util/math'
+import {getAngleOfInclination, getPointsArrayCenter, radToDeg} from './util/math'
 
 const MODEL_URL = '/models'
 
@@ -13,6 +13,7 @@ function App() {
   const inputRef = useRef<HTMLInputElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [imageAngle, setImageAngle] = useState(0)
 
   const start = ()=>{
     console.log('loadedd')
@@ -57,6 +58,14 @@ function App() {
 
     console.log({ alignmentLandmarks })
 
+    const angle = getAngleOfInclination(alignmentLandmarks.rightEyeMid, alignmentLandmarks.eyesMid)
+
+    // console.log({ angle })
+
+    setImageAngle(radToDeg(angle))
+
+    // if(imageRef.current) imageRef.current.style=`transform: rotateZ(${radToDeg(angle)})`
+
     faceapi.draw.drawDetections(apiCanvas, resizedDetections)
     faceapi.draw.drawFaceLandmarks(apiCanvas, resizedDetections)
     //
@@ -79,7 +88,7 @@ function App() {
       <div className="App">
         <Input ref={inputRef} type="file" id="ImageUpload" onChange={handleChange}/>
         <Box pos="relative" border="1px solid red">
-          <Image ref={imageRef} border="1px solid green"/>
+          <Image ref={imageRef} transform={`rotateZ(${-imageAngle}deg)`} border="1px solid green"/>
           <Box pos="absolute" left="50%" top={0} border="1px solid blue" transform="translate(-50%, 0)">
             <canvas ref={canvasRef}></canvas>
           </Box>

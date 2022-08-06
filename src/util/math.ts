@@ -14,6 +14,14 @@ export function getPointsArrayCenter(points: PointArray):IPoint{
 }
 
 
-export function getAngleOfInclination(){
+export function getAngleOfInclination(a: IPoint, b: IPoint){
+    const slope = (b.y - a.y)/(b.x - a.x)
+    return Math.atan(slope)
     //https://www.youtube.com/watch?v=kME3XP_F6vU
+}
+
+export function radToDeg(radians: number)
+{
+    const pi = Math.PI
+    return radians * (180/pi)
 }
