@@ -1,6 +1,25 @@
-# Getting Started with Create React App
+# Face Center Video Creator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React TypeScript application that creates videos with perfectly centered faces from portrait photos.
+
+## Features
+
+- **Face Detection**: Automatically detects faces in portrait photos using face-api.js
+- **Face Centering**: Centers faces based on eye positions for consistent alignment
+- **Video Creation**: Generates MP4 videos with customizable settings using FFmpeg.wasm
+- **Multiple Transitions**: Support for hard cuts, fade transitions, and morphing effects
+- **Responsive UI**: Modern, mobile-friendly interface built with Chakra UI
+
+## Architecture
+
+This application follows a modular service-based architecture:
+
+- **Services**: Core business logic for face detection, image processing, and video creation
+- **Store**: Zustand-based state management for the entire application
+- **Components**: Reusable UI components for different app sections
+- **Types**: Comprehensive TypeScript interfaces for type safety
+
+## Getting Started
 
 ## Available Scripts
 

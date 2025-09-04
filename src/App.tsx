@@ -1,100 +1,114 @@
-import React, { useEffect, useRef, useState }  from 'react'
-import './App.css'
-import * as faceapi from 'face-api.js'
-import { Input, Image, Box } from '@chakra-ui/react'
-import {getAngleOfInclination, getPointsArrayCenter, radToDeg} from './util/math'
-
-const MODEL_URL = '/models'
-
-const LEFT_EYE_IDS = [36, 37, 38, 39, 40, 41] // zero based off of landmark68
-const RIGHT_EYE_IDS = [42, 43, 44, 45, 46, 47] // zero based off of landmark68
+import React, { useEffect } from 'react';
+import { ChakraProvider, Container, VStack, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
+import { useAppStore } from './store/appStore';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { LoadingSpinner } from './components/LoadingSpinner';
+import { ProgressIndicator } from './components/ProgressIndicator';
+import { ImageUpload } from './components/ImageUpload';
+import { ImagePreview } from './components/ImagePreview';
+import { VideoSettings } from './components/VideoSettings';
+import { VideoPreview } from './components/VideoPreview';
+import './App.css';
 
 function App() {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const imageRef = useRef<HTMLImageElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [imageAngle, setImageAngle] = useState(0)
+  const {
+    currentStep,
+    isLoading,
+    error,
+    initializeServices,
+    setError,
+    processingProgress
+  } = useAppStore();
 
-  const start = ()=>{
-    console.log('loadedd')
-  }
+  useEffect(() => {
+    // Initialize services when the app starts
+    initializeServices().catch((error) => {
+      console.error('Failed to initialize app:', error);
+    });
+  }, [initializeServices]);
 
-  useEffect(()=>{
-    Promise.all([
-      faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-      faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-      faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
-    ]).then(start)
-  }, [])
-
-  const handleChange = async ()=>{
-    console.log('handleChange')
-    if (!inputRef.current || !canvasRef.current ||!inputRef.current.files) return
-
-    const image = await faceapi.bufferToImage(inputRef.current.files[0])
-
-    // const centeredCanvas = await faceapi.imageToSquare(image, 500, true)
-
-    if(imageRef.current) imageRef.current.src = image.src
-
-    const apiCanvas = faceapi.createCanvasFromMedia(image)
-
-    const displaySize = { width: apiCanvas.width, height: apiCanvas.height }
-    faceapi.matchDimensions(apiCanvas, displaySize)
-
-    const detections = await faceapi.detectAllFaces(image).withFaceLandmarks().withFaceDescriptors()
-
-    const resizedDetections = faceapi.resizeResults(detections, displaySize)
-
-    const alignmentLandmarks = {
-      leftEyeMid: getPointsArrayCenter(resizedDetections[0].landmarks.getLeftEye()),
-      rightEyeMid: getPointsArrayCenter(resizedDetections[0].landmarks.getRightEye()),
-      eyesMid: { x:0, y:0 }
-    }
-    alignmentLandmarks.eyesMid = getPointsArrayCenter([alignmentLandmarks.leftEyeMid, alignmentLandmarks.rightEyeMid])
-
-    //Align face
-    //const alignedBox = faceapi.FaceLandmarks.prototype.align(resizedDetections[0].detection, { useDlibAlignment: true })
-
-    console.log({ alignmentLandmarks })
-
-    const angle = getAngleOfInclination(alignmentLandmarks.rightEyeMid, alignmentLandmarks.eyesMid)
-
-    // console.log({ angle })
-
-    setImageAngle(radToDeg(angle))
-
-    // if(imageRef.current) imageRef.current.style=`transform: rotateZ(${radToDeg(angle)})`
-
-    faceapi.draw.drawDetections(apiCanvas, resizedDetections)
-    faceapi.draw.drawFaceLandmarks(apiCanvas, resizedDetections)
-    //
-    canvasRef.current.width = apiCanvas.width
-    canvasRef.current.height = apiCanvas.height
-
-
-    const destCtx = canvasRef.current.getContext('2d')
-
-    if (destCtx){
-      //Draw Source Image
-      destCtx.drawImage(apiCanvas, 0, 0)
-
-      //Draw detections
-      destCtx.drawImage(apiCanvas, 0, 0)
-    }
-  }
+  const clearError = () => setError(null);
 
   return (
-      <div className="App">
-        <Input ref={inputRef} type="file" id="ImageUpload" onChange={handleChange}/>
-        <Box pos="relative" border="1px solid red">
-          <Image ref={imageRef} transform={`rotateZ(${-imageAngle}deg)`} border="1px solid green"/>
-          <Box pos="absolute" left="50%" top={0} border="1px solid blue" transform="translate(-50%, 0)">
-            <canvas ref={canvasRef}></canvas>
-          </Box>
-        </Box>
-      </div>
-  )
+    <ChakraProvider>
+      <ErrorBoundary>
+        <Container maxW="container.xl" py={8}>
+          <VStack spacing={8}>
+            {/* Header */}
+            <VStack spacing={2}>
+              <h1 style={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center' }}>
+                Face Center Video Creator
+              </h1>
+              <p style={{ textAlign: 'center', color: 'gray' }}>
+                Upload portrait photos and create a video with faces perfectly centered
+              </p>
+            </VStack>
+
+            {/* Error Display */}
+            {error && (
+              <Alert status="error" borderRadius="md">
+                <AlertIcon />
+                <VStack align="start" flex="1">
+                  <AlertTitle>Error!</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </VStack>
+                <button 
+                  onClick={clearError}
+                  style={{ 
+                    marginLeft: 'auto', 
+                    padding: '4px 8px', 
+                    borderRadius: '4px',
+                    border: '1px solid #E53E3E',
+                    background: 'transparent',
+                    color: '#E53E3E',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Dismiss
+                </button>
+              </Alert>
+            )}
+
+            {/* Loading Spinner */}
+            {isLoading && (
+              <LoadingSpinner 
+                message={processingProgress?.message || "Loading..."} 
+              />
+            )}
+
+            {/* Progress Indicator */}
+            {processingProgress && (
+              <ProgressIndicator progress={processingProgress} />
+            )}
+
+            {/* Step-based UI */}
+            {currentStep === 'upload' && <ImageUpload />}
+            {currentStep === 'processing' && (
+              <VStack spacing={4}>
+                <h2>Processing Images...</h2>
+                <p>Detecting faces and centering images</p>
+              </VStack>
+            )}
+            {currentStep === 'preview' && (
+              <VStack spacing={6} w="100%">
+                <ImagePreview />
+                <VideoSettings />
+              </VStack>
+            )}
+            {currentStep === 'generating' && (
+              <VStack spacing={4}>
+                <h2>Generating Video...</h2>
+                <p>Creating your face-centered video</p>
+              </VStack>
+            )}
+
+            {/* Video Preview - Show when video is generated */}
+            <VideoPreview />
+          </VStack>
+        </Container>
+      </ErrorBoundary>
+    </ChakraProvider>
+  );
 }
 
 export default App;
